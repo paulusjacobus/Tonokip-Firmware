@@ -1,9 +1,5 @@
-Tonokip RepRap firmware rewrite based off of Hydra-mmm firmware.
+RepRap firmware rewrite based off of Sprinter, Tonokip and Hydra-mmm firmware.
 
-TODO:
-Inactivity timer failsafe that can be enabled/disabled by using a custom Mcode.
-Max Endstop support (easy).
-Add support for DC Extruders.
-Store internal position using steps(long int) instead of units(float).
+Used within an Arduino Uno to drive a Z axis SLA Printer @ 115200 Baudrate
 
-Test thermocouple support.
+
