@@ -54,8 +54,8 @@ boolean comment_mode = false;
 char *strchr_pointer; // just a pointer to find chars in the cmd string like X, Y, Z, E, etc
 
 //manage heater variables
-int target_raw = 0;
-int current_raw;
+//int target_raw = 0;
+//int current_raw;
 
 //Inactivity shutdown variables
 unsigned long previous_millis_cmd=0;
@@ -97,7 +97,7 @@ void setup()
 void loop()
 {
   get_command();
-  manage_heater();
+ // manage_heater();
   
   manage_inactivity(1); //shutdown if not receiving any new commands
 }
@@ -253,11 +253,11 @@ inline void process_commands()
         ClearToSend();
         return;
       case 4: // G4 dwell
-        codenum = 0;
-        if(code_seen('P')) codenum = code_value(); // milliseconds to wait
-        if(code_seen('S')) codenum = code_value()*1000; // seconds to wait
-        previous_millis_heater = millis();  // keep track of when we started waiting
-        while((millis() - previous_millis_heater) < codenum ) manage_heater(); //manage heater until time is up
+        //codenum = 0;
+        //if(code_seen('P')) codenum = code_value(); // milliseconds to wait
+        //if(code_seen('S')) codenum = code_value()*1000; // seconds to wait
+        //previous_millis_heater = millis();  // keep track of when we started waiting
+        //while((millis() - previous_millis_heater) < codenum ) manage_heater(); //manage heater until time is up
         break;
       case 90: // G90
         relative_mode = false;
@@ -281,25 +281,25 @@ inline void process_commands()
     switch( (int)code_value() ) 
     {
       case 104: // M104
-        if (code_seen('S')) target_raw = temp2analog(code_value());
+        //if (code_seen('S')) target_raw = temp2analog(code_value());
         break;
       case 105: // M105
         Serial.print("T:");
-        Serial.println( analog2temp(analogRead(TEMP_0_PIN)) ); 
+        //Serial.println( analog2temp(analogRead(TEMP_0_PIN)) ); 
         if(!code_seen('N')) return;  // If M105 is sent from generated gcode, then it needs a response.
         break;
       case 109: // M109 - Wait for heater to reach target.
-        if (code_seen('S')) target_raw = temp2analog(code_value());
-        previous_millis_heater = millis(); 
-        while(current_raw < target_raw) {
-          if( (millis()-previous_millis_heater) > 1000 ) //Print Temp Reading every 1 second while heating up.
-          {
-            Serial.print("T:");
-            Serial.println( analog2temp(analogRead(TEMP_0_PIN)) ); 
-            previous_millis_heater = millis(); 
-          }
-          manage_heater();
-        }
+        //if (code_seen('S')) target_raw = temp2analog(code_value());
+        //previous_millis_heater = millis(); 
+        //while(current_raw < target_raw) {
+        //  if( (millis()-previous_millis_heater) > 1000 ) //Print Temp Reading every 1 second while heating up.
+         // {
+         //   Serial.print("T:");
+         //   Serial.println( analog2temp(analogRead(TEMP_0_PIN)) ); 
+         //   previous_millis_heater = millis(); 
+         // }
+        //  manage_heater();
+        //}
         break;
       case 80: // M81 - ATX Power On
         if(PS_ON_PIN > -1) pinMode(PS_ON_PIN,OUTPUT); //GND
@@ -440,12 +440,12 @@ void linear_move(unsigned long x_steps_remaining, unsigned long y_steps_remainin
     
     if(e_steps_remaining) if ((micros()-previous_micros_e) >= e_interval) { do_e_step(); e_steps_remaining--; }
     
-    if( (millis() - previous_millis_heater) >= 500 ) {
-      manage_heater();
-      previous_millis_heater = millis();
+    //if( (millis() - previous_millis_heater) >= 500 ) {
+    //  manage_heater();
+    //  previous_millis_heater = millis();
       
-      manage_inactivity(2);
-    }
+     // manage_inactivity(2);
+    //}
   }
   
   if(DISABLE_X) disable_x();
@@ -506,73 +506,73 @@ inline void  enable_y() { if(Y_ENABLE_PIN > -1) digitalWrite(Y_ENABLE_PIN, Y_ENA
 inline void  enable_z() { if(Z_ENABLE_PIN > -1) digitalWrite(Z_ENABLE_PIN, Z_ENABLE_ON); }
 inline void  enable_e() { if(E_ENABLE_PIN > -1) digitalWrite(E_ENABLE_PIN, E_ENABLE_ON); }
 
-inline void manage_heater()
-{
-  current_raw = analogRead(TEMP_0_PIN);                  // If using thermistor, when the heater is colder than targer temp, we get a higher analog reading than target, 
-  if(USE_THERMISTOR) current_raw = 1023 - current_raw;   // this switches it up so that the reading appears lower than target for the control logic.
+//inline void manage_heater()
+//{
+//  current_raw = analogRead(TEMP_0_PIN);                  // If using thermistor, when the heater is colder than targer temp, we get a higher analog reading than target, 
+//  if(USE_THERMISTOR) current_raw = 1023 - current_raw;   // this switches it up so that the reading appears lower than target for the control logic.
   
-  if(current_raw >= target_raw) digitalWrite(HEATER_0_PIN,LOW);
-  else digitalWrite(HEATER_0_PIN,HIGH);
-}
+//  if(current_raw >= target_raw) digitalWrite(HEATER_0_PIN,LOW);
+//  else digitalWrite(HEATER_0_PIN,HIGH);
+//}
 
 // Takes temperature value as input and returns corresponding analog value from RepRap thermistor temp table.
 // This is needed because PID in hydra firmware hovers around a given analog value, not a temp value.
 // This function is derived from inversing the logic from a portion of getTemperature() in FiveD RepRap firmware.
-float temp2analog(int celsius) {
-  if(USE_THERMISTOR) {
-    int raw = 0;
-    byte i;
+//float temp2analog(int celsius) {
+//  if(USE_THERMISTOR) {
+//    int raw = 0;
+//    byte i;
     
-    for (i=1; i<NUMTEMPS; i++)
-    {
-      if (temptable[i][1] < celsius)
-      {
-        raw = temptable[i-1][0] + 
-          (celsius - temptable[i-1][1]) * 
-          (temptable[i][0] - temptable[i-1][0]) /
-          (temptable[i][1] - temptable[i-1][1]);
+//    for (i=1; i<NUMTEMPS; i++)
+//    {
+//      if (temptable[i][1] < celsius)
+//      {
+//        raw = temptable[i-1][0] + 
+//          (celsius - temptable[i-1][1]) * 
+//          (temptable[i][0] - temptable[i-1][0]) /
+//          (temptable[i][1] - temptable[i-1][1]);
       
-        break;
-      }
-    }
+//        break;
+//      }
+//    }
 
     // Overflow: Set to last value in the table
-    if (i == NUMTEMPS) raw = temptable[i-1][0];
+//    if (i == NUMTEMPS) raw = temptable[i-1][0];
 
-    return 1023 - raw;
-  } else {
-    return celsius * (1024.0/(5.0*100.0));
-  }
-}
+//    return 1023 - raw;
+//  } else {
+//    return celsius * (1024.0/(5.0*100.0));
+//  }
+//}
 
 // Derived from RepRap FiveD extruder::getTemperature()
-float analog2temp(int raw) {
-  if(USE_THERMISTOR) {
-    int celsius = 0;
-    byte i;
+//float analog2temp(int raw) {
+//  if(USE_THERMISTOR) {
+ //   int celsius = 0;
+//    byte i;
 
-    for (i=1; i<NUMTEMPS; i++)
-    {
-      if (temptable[i][0] > raw)
-      {
-        celsius  = temptable[i-1][1] + 
-          (raw - temptable[i-1][0]) * 
-          (temptable[i][1] - temptable[i-1][1]) /
-          (temptable[i][0] - temptable[i-1][0]);
+//    for (i=1; i<NUMTEMPS; i++)
+//    {
+//      if (temptable[i][0] > raw)
+//      {
+//        celsius  = temptable[i-1][1] + 
+//          (raw - temptable[i-1][0]) * 
+//          (temptable[i][1] - temptable[i-1][1]) /
+ //         (temptable[i][0] - temptable[i-1][0]);
 
-        break;
-      }
-    }
+ //       break;
+ //     }
+ //   }
 
     // Overflow: Set to last value in the table
-    if (i == NUMTEMPS) celsius = temptable[i-1][1];
+ //   if (i == NUMTEMPS) celsius = temptable[i-1][1];
 
-    return celsius;
+//    return celsius;
     
-  } else {
-    return raw * ((5.0*100.0)/1024.0);
-  }
-}
+//  } else {
+//    return raw * ((5.0*100.0)/1024.0);
+//  }
+//}
 
 inline void kill(byte debug)
 {
