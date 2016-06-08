@@ -27,10 +27,10 @@ const bool Z_ENABLE_ON = 0;
 const bool E_ENABLE_ON = 0;
 
 //Disables axis when it's not being used.
-const bool DISABLE_X = false;
-const bool DISABLE_Y = false;
-const bool DISABLE_Z = true;
-const bool DISABLE_E = false;
+const bool DISABLE_X = true;
+const bool DISABLE_Y = true;
+const bool DISABLE_Z = false;
+const bool DISABLE_E = true;
 
 const bool INVERT_X_DIR = false;
 const bool INVERT_Y_DIR = false;
@@ -45,6 +45,6 @@ const int X_MAX_LENGTH = 200;
 const int Y_MAX_LENGTH = 200;
 const int Z_MAX_LENGTH = 120;
 
-#define BAUDRATE 19200
+#define BAUDRATE 115200
 
 #endif
