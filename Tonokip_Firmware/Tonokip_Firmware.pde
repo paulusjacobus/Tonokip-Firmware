@@ -46,7 +46,7 @@ bool relative_mode = false;  //Determines Absolute or Relative Coordinates
 bool relative_mode_e = false;  //Determines Absolute or Relative E Codes while in Absolute Coordinates mode. E is always relative in Relative Coordinates mode.
 
 // comm variables
-#define MAX_CMD_SIZE 256
+#define MAX_CMD_SIZE 96 //256
 char cmdbuffer[MAX_CMD_SIZE];
 char serial_char;
 int serial_count = 0;
@@ -221,7 +221,7 @@ inline void process_commands()
         if(z_steps_to_take) z_interval = time_for_move/z_steps_to_take;
         if(e_steps_to_take) e_interval = time_for_move/e_steps_to_take;
         
-        #define DEBUGGING false
+        #define DEBUGGING true
         if(DEBUGGING) {
           Serial.print("destination_x: "); Serial.println(destination_x); 
           Serial.print("current_x: "); Serial.println(current_x); 
